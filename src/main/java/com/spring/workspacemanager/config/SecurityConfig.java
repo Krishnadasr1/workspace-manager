@@ -3,7 +3,6 @@ package com.spring.workspacemanager.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,10 +15,10 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // We'll handle CSRF later for APIs
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login", "/auth/register").permitAll() // Public
+                        .requestMatchers("/api/auth/login", "/api/auth/register").permitAll() // Public
                         .anyRequest().authenticated() // All other endpoints need login
                 )
-                .formLogin(Customizer.withDefaults())
+                .formLogin(form -> form.disable())
                 .logout(logout->logout
                         .logoutUrl("/auth/logout")
                         .deleteCookies("JSESSIONID")
