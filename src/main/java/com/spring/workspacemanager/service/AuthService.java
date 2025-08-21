@@ -6,6 +6,7 @@ import com.spring.workspacemanager.model.Role;
 import com.spring.workspacemanager.model.User;
 import com.spring.workspacemanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,20 +17,28 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    public boolean emailExists(String email) {
+        return userRepository.existsByEmail(email);
+    }
 
-    public String register(RegisterRequest request){
-        if (userRepository.existsByEmail(request.getEmail())){
-            throw new RuntimeException("Email already in use");
+
+    public ResponseEntity<?> register(RegisterRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("Error: Email already in use");
         }
+
         User user = User.builder()
                 .name(request.getName())
                 .email(request.getEmail())
-                .password(request.getPassword())
-                .role(request.getRole()!=null? request.getRole(): Role.USER)
+                .password(request.getPassword()) // ⚠️ don’t forget to encode later
+                .role(request.getRole() != null ? request.getRole() : Role.USER)
                 .build();
-        userRepository.save(user);
-        return "registered Successfully";
 
+        userRepository.save(user);
+        return ResponseEntity.ok("Registered successfully");
     }
+
 
 }
