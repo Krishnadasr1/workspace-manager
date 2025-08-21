@@ -19,8 +19,14 @@ public class AuthController {
 
      private final AuthService authService;
     @PostMapping("/register")
-    public ResponseEntity<String> register( @RequestBody RegisterRequest request) {
-        String result = authService.register(request);
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+        if (authService.emailExists(request.getEmail())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("Error: Email already in use");
+        }
+
+        String result = String.valueOf(authService.register(request));
         return ResponseEntity.ok(result);
     }
 }
